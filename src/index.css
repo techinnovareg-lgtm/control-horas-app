@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Glassmorphism */
+  --color-glass-100: rgba(255, 255, 255, 0.08);
+  --color-glass-200: rgba(255, 255, 255, 0.15);
+  --color-glass-300: rgba(255, 255, 255, 0.25);
+  --color-glass-400: rgba(255, 255, 255, 0.35);
+  --color-glass-500: rgba(255, 255, 255, 0.50);
+
+  /* Tech Innova — Paleta Vino/Borgoña */
+  --color-primary-50: #fdf2f6;
+  --color-primary-100: #fce7ef;
+  --color-primary-200: #f9cfe0;
+  --color-primary-300: #f4a3c2;
+  --color-primary-400: #ec6d9c;
+  --color-primary-500: #d63d72;
+  --color-primary-600: #a8174a;
+  /* color principal */
+  --color-primary-700: #8b1a4a;
+  /* vino oscuro */
+  --color-primary-800: #6d1239;
+  --color-primary-900: #4e0d28;
+  --color-primary-950: #2e0717;
+
+  /* Crema/Beige del logo */
+  --color-cream-50: #fdf8f0;
+  --color-cream-100: #f9f0e0;
+  --color-cream-200: #f3e1c4;
+
+  --backdrop-blur-xs: 2px;
+}
+
+@layer base {
+  body {
+    @apply text-slate-900;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #fdf2f6 0%, #f9f0e0 40%, #fce7ef 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-white/75 backdrop-blur-lg border border-white/30 shadow-xl;
+  }
+
+  .glass-card {
+    @apply bg-white/60 backdrop-blur-md border border-white/40 shadow-sm transition-all hover:shadow-md;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white/70 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all placeholder:text-slate-400;
+  }
+
+  .btn-primary {
+    @apply px-6 py-2.5 rounded-xl bg-primary-700 text-white font-semibold hover:bg-primary-800 active:scale-95 transition-all shadow-md shadow-primary-700/30;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-2.5 rounded-xl bg-white text-slate-700 font-medium border border-slate-200 hover:bg-slate-50 active:scale-95 transition-all;
+  }
+
+  /* Decoración de fondo */
+  .bg-blob-1 {
+    background: radial-gradient(circle, rgba(168, 23, 74, 0.12) 0%, transparent 70%);
+  }
+
+  .bg-blob-2 {
+    background: radial-gradient(circle, rgba(243, 225, 196, 0.4) 0%, transparent 70%);
+  }
+}
