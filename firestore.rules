@@ -17,5 +17,15 @@ service cloud.firestore {
     match /periods/{periodId} {
       allow read, write: if true;
     }
+
+    // Reglas para Vacaciones
+    match /vacations/{id} {
+      allow read, write: if true;
+    }
+
+    // Reglas para Documentos
+    match /documents/{id} {
+      allow read, write: if true;
+    }
   }
 }

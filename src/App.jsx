@@ -103,86 +103,100 @@ function AppContent() {
     return null;
   };
 
-  return (
-    <Layout>
-      {/* Navegación Principal: Los 3 Paneles Clave + Secundarios */}
-      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
-        <div className="flex gap-1.5 bg-white/60 backdrop-blur-md border border-white/40 p-1.5 rounded-[24px] shadow-sm flex-wrap">
+  const sidebarContent = (
+    <div className="flex flex-col gap-8 py-4">
+      {/* Grupo Principal */}
+      <div>
+        <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Principal</p>
+        <div className="flex flex-col gap-1">
           <button
-            id="nav-hours"
             onClick={() => {
               setActiveTab('hours');
               setSubTab('dashboard');
               setShowCreate(false);
               setSelectedPeriodId(null);
             }}
-            className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'hours'
-              ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
-              : 'text-slate-600 hover:bg-white/80'
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'hours'
+              ? 'bg-primary-50 text-primary-700 shadow-sm'
+              : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
           >
-            <LayoutDashboard className="w-4 h-4" />
+            <div className={`p-2 rounded-xl transition-all ${activeTab === 'hours' ? 'bg-primary-700 text-white' : 'bg-slate-100 text-slate-500'}`}>
+              <Clock className="w-4 h-4" />
+            </div>
             Control de Horas
           </button>
 
           {(user.features?.vacations || isAdmin) && (
             <button
-              id="nav-vacations"
               onClick={() => { setActiveTab('vacations'); setShowCreate(false); }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'vacations'
-                ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
-                : 'text-slate-600 hover:bg-white/80'
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'vacations'
+                ? 'bg-primary-50 text-primary-700 shadow-sm'
+                : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
             >
-              <Palmtree className="w-4 h-4" />
+              <div className={`p-2 rounded-xl transition-all ${activeTab === 'vacations' ? 'bg-primary-700 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <Palmtree className="w-4 h-4" />
+              </div>
               Vacaciones
             </button>
           )}
 
           {(user.features?.documents || isAdmin) && (
             <button
-              id="nav-documents"
               onClick={() => { setActiveTab('documents'); setShowCreate(false); }}
-              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'documents'
-                ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
-                : 'text-slate-600 hover:bg-white/80'
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'documents'
+                ? 'bg-primary-50 text-primary-700 shadow-sm'
+                : 'text-slate-600 hover:bg-white hover:text-slate-900'
                 }`}
             >
-              <FileText className="w-4 h-4" />
+              <div className={`p-2 rounded-xl transition-all ${activeTab === 'documents' ? 'bg-primary-700 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <FileText className="w-4 h-4" />
+              </div>
               Boletas
-            </button>
-          )}
-        </div>
-
-        <div className="flex gap-1.5 bg-slate-100/30 p-1.5 rounded-[24px] border border-slate-200/30 flex-wrap">
-          <button
-            id="nav-support"
-            onClick={() => { setActiveTab('support'); setShowCreate(false); }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-xs font-bold transition-all ${activeTab === 'support'
-              ? 'bg-slate-700 text-white shadow-md'
-              : 'text-slate-500 hover:bg-white/80'
-              }`}
-          >
-            <LifeBuoy className="w-4 h-4" />
-            Soporte
-          </button>
-
-          {isAdmin && (
-            <button
-              id="nav-admin"
-              onClick={() => { setActiveTab('admin'); setShowCreate(false); }}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-xs font-bold transition-all ${activeTab === 'admin'
-                ? 'bg-slate-700 text-white shadow-md'
-                : 'text-slate-500 hover:bg-white/80'
-                }`}
-            >
-              <Shield className="w-4 h-4" />
-              Admin
             </button>
           )}
         </div>
       </div>
 
+      {/* Grupo Sistema */}
+      <div>
+        <p className="px-4 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Sistema</p>
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => { setActiveTab('support'); setShowCreate(false); }}
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'support'
+              ? 'bg-slate-100 text-slate-900 shadow-sm'
+              : 'text-slate-600 hover:bg-white hover:text-slate-900'
+              }`}
+          >
+            <div className={`p-2 rounded-xl transition-all ${activeTab === 'support' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500'}`}>
+              <LifeBuoy className="w-4 h-4" />
+            </div>
+            Soporte
+          </button>
+
+          {isAdmin && (
+            <button
+              onClick={() => { setActiveTab('admin'); setShowCreate(false); }}
+              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'admin'
+                ? 'bg-slate-100 text-slate-900 shadow-sm'
+                : 'text-slate-600 hover:bg-white hover:text-slate-900'
+                }`}
+            >
+              <div className={`p-2 rounded-xl transition-all ${activeTab === 'admin' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                <Shield className="w-4 h-4" />
+              </div>
+              Administración
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <Layout sidebar={sidebarContent}>
       {renderContent()}
     </Layout >
   );

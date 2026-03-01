@@ -5,7 +5,7 @@ import HistoryTable from './HistoryTable';
 import EntryForm from './EntryForm';
 import OverviewCharts from './OverviewCharts';
 import { exportToExcel, exportToPDF } from '../../utils/exportUtils';
-import { Archive, FileSpreadsheet, FileText, ArrowLeft, Plus, ChevronDown, Trash2 } from 'lucide-react';
+import { Archive, FileSpreadsheet, FileText, ArrowLeft, Plus, ChevronDown, Trash2, Clock, CheckCircle2, History } from 'lucide-react';
 
 const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBackToActive, onSelectPeriod, onStartCreate }) => {
     const {
