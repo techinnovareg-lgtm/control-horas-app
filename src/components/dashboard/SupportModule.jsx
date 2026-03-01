@@ -9,6 +9,7 @@ import {
 const SupportModule = () => {
     const { user } = useAuth();
     const { getLicenseStatus, setUserPassword } = useUsers();
+    const isAdmin = user?.role === 'admin';
     const [isChangingPass, setIsChangingPass] = useState(false);
     const [newPass, setNewPass] = useState('');
     const [confirmPass, setConfirmPass] = useState('');

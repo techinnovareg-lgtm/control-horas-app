@@ -7,11 +7,7 @@ const Layout = ({ children, sidebar }) => {
 
     return (
         <div className="min-h-screen flex relative overflow-hidden bg-slate-50">
-            {/* Blobs decorativos de fondo */}
-            <div className="fixed top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full blur-[120px] -z-10 opacity-20 animate-pulse"
-                style={{ background: 'radial-gradient(circle, #f4a3c2, transparent)' }} />
-            <div className="fixed bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full blur-[120px] -z-10 opacity-15"
-                style={{ background: 'radial-gradient(circle, #f9f0e0, transparent)' }} />
+            {/* Fondo limpio original */}
 
             {/* Sidebar Lateral */}
             <aside className="hidden lg:flex flex-col w-72 h-screen sticky top-0 bg-white/40 backdrop-blur-xl border-r border-slate-200/50 z-40">
