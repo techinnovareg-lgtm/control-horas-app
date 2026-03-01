@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { LogOut, Shield } from 'lucide-react';
 
 const Layout = ({ children }) => {
@@ -27,8 +27,8 @@ const Layout = ({ children }) => {
                                 className="h-10 object-contain"
                             />
                             <div className="hidden sm:block border-l border-slate-200 pl-3">
-                                <p className="text-sm font-bold text-slate-700 leading-tight">Control de Horas</p>
-                                <p className="text-xs text-slate-400 leading-tight">No Laboradas y Recuperadas</p>
+                                <p className="text-sm font-bold text-slate-700 leading-tight">Labora</p>
+                                <p className="text-xs text-slate-400 leading-tight">Gestión Laboral Integral</p>
                             </div>
                         </div>
 
@@ -76,7 +76,7 @@ const Layout = ({ children }) => {
                         </span>
                     </div>
                     <span className="text-xs text-slate-400">
-                        © {new Date().getFullYear()} Control de Horas
+                        © {new Date().getFullYear()} Labora
                     </span>
                 </div>
             </footer>

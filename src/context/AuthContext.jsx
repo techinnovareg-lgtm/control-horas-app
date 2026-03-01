@@ -1,13 +1,20 @@
-import React, { createContext, useContext } from 'react';
+import React, { useEffect } from 'react';
+import { AuthContext } from './Context';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useUsers } from '../hooks/useUsers';
 
-const AuthContext = createContext(null);
+
 
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useLocalStorage('tracker_current_user', null);
+    const { initSuperAdmin } = useUsers();
+
+    // Inicializar superadmin en Firestore al arrancar
+    useEffect(() => {
+        initSuperAdmin();
+    }, [initSuperAdmin]);
 
     const loginAs = (user) => {
-        // Guardamos solo los datos esenciales del usuario en sesión
         setCurrentUser({
             id: user.id,
             name: user.name,
@@ -28,8 +35,4 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) throw new Error('useAuth must be used within an AuthProvider');
-    return context;
-};
+

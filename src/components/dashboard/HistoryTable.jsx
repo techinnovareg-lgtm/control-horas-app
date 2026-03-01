@@ -32,7 +32,7 @@ const HistoryTable = ({ entries, onDelete, onEdit }) => {
         setError(null);
     };
 
-    const handleSave = (entryId) => {
+    const handleSave = async (entryId) => {
         try {
             if (!editData.date || !editData.hours) {
                 setError('Completa los campos obligatorios.');
@@ -43,10 +43,8 @@ const HistoryTable = ({ entries, onDelete, onEdit }) => {
                 return;
             }
 
-            const result = onEdit(entryId, editData);
+            const result = await onEdit(entryId, editData);
             if (result?.completed) {
-                // Si al editar se completó el período, el componente padre probablemente desmonte o cambie vista
-                // pero por seguridad limpiamos estado
                 cancelEdit();
             } else {
                 cancelEdit();

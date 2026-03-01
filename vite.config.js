@@ -10,5 +10,5 @@ export default defineConfig({
   ],
   // IMPORTANTE: Cambia 'nombre-del-repo' por el nombre real de tu repositorio en GitHub
   // Si vas a desplegar en https://usuario.github.io/recuperar-horas/, usa base: '/recuperar-horas/'
-  base: './',
+  base: '/control-horas-app/',
 })

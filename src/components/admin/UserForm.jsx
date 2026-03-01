@@ -1,24 +1,30 @@
 import React, { useState } from 'react';
-import { useUsers, LICENSE_TYPES } from '../../hooks/useUsers';
-import { X, UserPlus, Mail, User, Calendar } from 'lucide-react';
+import { useUsers, LICENSE_TYPES, PLANS } from '../../hooks/useUsers';
+import { X, UserPlus, Mail, User, Calendar, Palmtree, FileText, CheckCircle2 } from 'lucide-react';
 
 const UserForm = ({ onClose }) => {
     const { createUser } = useUsers();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [licenseType, setLicenseType] = useState('annual');
+    const [plan, setPlan] = useState('basic');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
-    const handleSubmit = (e) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
+        setIsSubmitting(true);
         try {
-            createUser({ name: name.trim(), email: email.trim(), licenseType });
+            await createUser({ name: name.trim(), email: email.trim(), licenseType, plan });
             setSuccess(true);
             setTimeout(() => onClose(), 1500);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -93,6 +99,34 @@ const UserForm = ({ onClose }) => {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-slate-500 uppercase mb-3">Plan de Servicio</label>
+                            <div className="grid grid-cols-1 gap-3">
+                                {Object.entries(PLANS).map(([key, val]) => (
+                                    <label
+                                        key={key}
+                                        className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${plan === key ? `border-${val.color}-500 bg-${val.color}-50 text-${val.color}-700` : 'border-slate-100 hover:border-slate-200 bg-white'}`}
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-black uppercase">{val.label}</span>
+                                            <span className="text-[10px] opacity-70">
+                                                {key === 'basic' && 'Solo Horas'}
+                                                {key === 'essential' && 'Horas + Vacaciones'}
+                                                {key === 'pro' && 'Horas + Vacaciones + Boletas'}
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="radio"
+                                            name="plan"
+                                            checked={plan === key}
+                                            onChange={() => setPlan(key)}
+                                            className="hidden"
+                                        />
+                                        {plan === key && <CheckCircle2 className="w-5 h-5" />}
+                                    </label>
+                                ))}
                             </div>
                         </div>
 

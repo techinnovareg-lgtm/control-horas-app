@@ -1,55 +1,115 @@
-import { useLocalStorage } from './useLocalStorage';
+import { useState, useEffect } from 'react';
+import { db } from '../config/firebase';
+import {
+    collection,
+    doc,
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    query,
+    where,
+    deleteDoc
+} from 'firebase/firestore';
 
 const generateId = () =>
     crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).substr(2);
 
-/**
- * Hook de gestión de períodos aislado por usuario.
- * Cada usuario tiene sus propias claves en LocalStorage:
- *   tracker_periods_<userId>
- *   tracker_active_period_id_<userId>
- */
 export function usePeriods(userId) {
-    // Claves únicas por usuario — garantiza aislamiento total
-    const periodsKey = userId ? `tracker_periods_${userId}` : 'tracker_periods_anonymous';
-    const activeIdKey = userId ? `tracker_active_period_id_${userId}` : 'tracker_active_period_id_anonymous';
+    const [periods, setPeriods] = useState([]);
+    const [activePeriodId, setActivePeriodId] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const [periods, setPeriods] = useLocalStorage(periodsKey, []);
-    const [activePeriodId, setActivePeriodId] = useLocalStorage(activeIdKey, null);
+    // 1. Suscripción a períodos del usuario
+    useEffect(() => {
+        if (!userId) return;
+
+        const q = query(collection(db, 'periods'), where('ownerId', '==', userId));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const periodsList = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            setPeriods(periodsList);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [userId]);
+
+    // 2. Suscripción al ID del período activo del usuario
+    useEffect(() => {
+        if (!userId) return;
+
+        const userRef = doc(db, 'users', userId);
+        const unsubscribe = onSnapshot(userRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setActivePeriodId(docSnap.data().activePeriodId || null);
+            }
+        });
+
+        return () => unsubscribe();
+    }, [userId]);
 
     const activePeriod = periods.find(p => p.id === activePeriodId) || null;
 
-    const createPeriod = (name) => {
-        if (activePeriod) {
-            throw new Error('Ya existe un período activo.');
+    const createPeriod = async (name) => {
+        try {
+            const periodId = generateId();
+            const newPeriod = {
+                id: periodId, // Añadimos ID aquí para el estado local
+                name,
+                ownerId: userId,
+                status: 'active',
+                createdAt: new Date().toISOString(),
+                entries: [],
+            };
+
+            // Actualización optimista del estado local
+            setPeriods(prev => [...prev, newPeriod]);
+            setActivePeriodId(periodId);
+
+            // Guardar período en Firestore
+            await setDoc(doc(db, 'periods', periodId), newPeriod);
+
+            // Actualizar referencia de activo en el usuario
+            await updateDoc(doc(db, 'users', userId), { activePeriodId: periodId });
+
+            return newPeriod;
+        } catch (error) {
+            console.error("Error creating period:", error);
+            throw error;
         }
-        const newPeriod = {
-            id: generateId(),
-            name,
-            ownerId: userId,
-            status: 'active',
-            createdAt: new Date().toISOString(),
-            entries: [],
-        };
-        setPeriods([...periods, newPeriod]);
-        setActivePeriodId(newPeriod.id);
-        return newPeriod;
     };
 
-    const archivePeriod = (periodId) => {
-        const updatedPeriods = periods.map(p =>
-            p.id === periodId
-                ? { ...p, status: 'archived', completedAt: new Date().toISOString() }
-                : p
-        );
-        setPeriods(updatedPeriods);
+    const archivePeriod = async (periodId) => {
+        await updateDoc(doc(db, 'periods', periodId), {
+            status: 'archived',
+            completedAt: new Date().toISOString()
+        });
+
         if (activePeriodId === periodId) {
-            setActivePeriodId(null);
+            await updateDoc(doc(db, 'users', userId), { activePeriodId: null });
         }
     };
 
-    const addEntry = (type, data) => {
-        if (!activePeriod) return;
+    const deletePeriod = async (periodId) => {
+        try {
+            // 1. Eliminar el documento del período
+            await deleteDoc(doc(db, 'periods', periodId));
+
+            // 2. Si es el activo, limpiar la referencia en el usuario
+            if (activePeriodId === periodId) {
+                await updateDoc(doc(db, 'users', userId), { activePeriodId: null });
+            }
+        } catch (error) {
+            console.error("Error deleting period:", error);
+            throw error;
+        }
+    };
+
+    const addEntry = async (type, data, targetPeriodId = null) => {
+        const periodId = targetPeriodId || activePeriodId;
+        if (!periodId) return;
+
+        const period = periods.find(p => p.id === periodId);
+        if (!period) return;
 
         const newEntry = {
             id: generateId(),
@@ -61,36 +121,34 @@ export function usePeriods(userId) {
         };
 
         if (type === 'recovered') {
-            const stats = getPeriodStats(activePeriod);
+            const stats = getPeriodStats(period);
             if (newEntry.hours > stats.balance) {
                 throw new Error(`No puedes recuperar ${newEntry.hours}h. Solo debes ${stats.balance}h.`);
             }
         }
 
-        const updatedPeriod = {
-            ...activePeriod,
-            entries: [...activePeriod.entries, newEntry],
-        };
+        const updatedEntries = [...period.entries, newEntry];
+        await updateDoc(doc(db, 'periods', periodId), { entries: updatedEntries });
 
-        setPeriods(periods.map(p => p.id === activePeriod.id ? updatedPeriod : p));
-
-        const newStats = calculateStats(updatedPeriod.entries);
+        const newStats = calculateStats(updatedEntries);
         if (newStats.owed > 0 && newStats.recovered >= newStats.owed) {
-            return { success: true, completed: true };
+            return { success: true, completed: true, periodId };
         }
-        return { success: true, completed: false };
+        return { success: true, completed: false, periodId };
     };
 
-    const editEntry = (entryId, newData) => {
-        if (!activePeriod) return;
+    const editEntry = async (entryId, newData, targetPeriodId = null) => {
+        const periodId = targetPeriodId || activePeriodId;
+        if (!periodId) return;
 
-        const originalEntry = activePeriod.entries.find(e => e.id === entryId);
+        const period = periods.find(p => p.id === periodId);
+        if (!period) return;
+
+        const originalEntry = period.entries.find(e => e.id === entryId);
         if (!originalEntry) return;
 
-        // Validaciones
         if (originalEntry.type === 'recovered') {
-            const stats = getPeriodStats(activePeriod);
-            // Calculamos el balance excluyendo, temporalmente, la entrada actual para ver si el nuevo valor cabe
+            const stats = getPeriodStats(period);
             const currentBalanceWithoutEntry = stats.owed - (stats.recovered - originalEntry.hours);
 
             if (Number(newData.hours) > currentBalanceWithoutEntry) {
@@ -105,26 +163,25 @@ export function usePeriods(userId) {
             notes: newData.notes || ''
         };
 
-        const updatedPeriod = {
-            ...activePeriod,
-            entries: activePeriod.entries.map(e => e.id === entryId ? updatedEntry : e)
-        };
+        const updatedEntries = period.entries.map(e => e.id === entryId ? updatedEntry : e);
+        await updateDoc(doc(db, 'periods', periodId), { entries: updatedEntries });
 
-        setPeriods(periods.map(p => p.id === activePeriod.id ? updatedPeriod : p));
-
-        // Check completion logic
-        const newStats = calculateStats(updatedPeriod.entries);
+        const newStats = calculateStats(updatedEntries);
         if (newStats.owed > 0 && newStats.recovered >= newStats.owed) {
-            return { success: true, completed: true };
+            return { success: true, completed: true, periodId };
         }
-        return { success: true, completed: false };
+        return { success: true, completed: false, periodId };
     };
 
-    const deleteEntry = (entryId) => {
-        if (!activePeriod) return;
-        const updatedEntries = activePeriod.entries.filter(e => e.id !== entryId);
-        const updatedPeriod = { ...activePeriod, entries: updatedEntries };
-        setPeriods(periods.map(p => p.id === activePeriod.id ? updatedPeriod : p));
+    const deleteEntry = async (entryId, targetPeriodId = null) => {
+        const periodId = targetPeriodId || activePeriodId;
+        if (!periodId) return;
+
+        const period = periods.find(p => p.id === periodId);
+        if (!period) return;
+
+        const updatedEntries = period.entries.filter(e => e.id !== entryId);
+        await updateDoc(doc(db, 'periods', periodId), { entries: updatedEntries });
     };
 
     const getPeriodStats = (period) => {
@@ -145,11 +202,14 @@ export function usePeriods(userId) {
     return {
         periods,
         activePeriod,
+        loading,
         createPeriod,
         archivePeriod,
         addEntry,
         editEntry,
         deleteEntry,
+        deletePeriod,
         getPeriodStats,
     };
 }
+

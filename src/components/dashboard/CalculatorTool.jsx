@@ -271,9 +271,9 @@ const CalculatorTool = () => {
                         <div className="flex items-center gap-4">
                             <input
                                 type="range"
-                                min="0.5"
-                                max="4"
-                                step="0.5"
+                                min="1"
+                                max="6"
+                                step="1"
                                 value={recoveryHours}
                                 onChange={(e) => setRecoveryHours(Number(e.target.value))}
                                 className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary-600"

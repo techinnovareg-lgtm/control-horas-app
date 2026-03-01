@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Reglas para usuarios
+    match /users/{userId} {
+      // Permitir lectura para que el sistema encuentre al usuario durante el login manual.
+      // Si usas Firebase Auth propiamente, esto se puede restringir más.
+      allow read: if true; 
+      
+      // Permitir que el superadmin se cree (id fijo 'superadmin') 
+      // y que los usuarios actualicen sus propios datos (o el admin a todos).
+      allow write: if userId == 'superadmin' || request.auth != null || true; 
+      // NOTA: 'allow write: if true' es inseguro para producción, pero necesario si no usas Firebase Auth.
+    }
+    
+    // Reglas para períodos (el contenido principal de la app)
+    match /periods/{periodId} {
+      allow read, write: if true;
+    }
+  }
+}

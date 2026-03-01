@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import { usePeriods } from './hooks/usePeriods';
 import Layout from './components/layout/Layout';
 import Auth from './components/auth/Auth';
@@ -8,12 +9,17 @@ import PeriodHistory from './components/dashboard/PeriodHistory';
 import CreatePeriod from './components/dashboard/CreatePeriod';
 import AdminPanel from './components/admin/AdminPanel';
 import CalculatorTool from './components/dashboard/CalculatorTool';
-import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar } from 'lucide-react';
+import VacationModule from './components/dashboard/VacationModule';
+import DocumentModule from './components/dashboard/DocumentModule';
+import SupportModule from './components/dashboard/SupportModule';
+import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy } from 'lucide-react';
 
 function AppContent() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('hours'); // 'hours', 'vacations', 'documents', 'support', 'admin'
+  const [subTab, setSubTab] = useState('dashboard'); // 'dashboard', 'calculator', 'history'
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedPeriodId, setSelectedPeriodId] = useState(null);
 
   if (!user) {
     return <Auth />;
@@ -22,125 +28,163 @@ function AppContent() {
   const isAdmin = user.role === 'admin';
 
   const renderContent = () => {
-    if (activeTab === 'admin' && isAdmin) {
-      return <AdminPanel />;
-    }
+    if (activeTab === 'vacations') return <VacationModule userId={user.id} />;
+    if (activeTab === 'documents') return <DocumentModule userId={user.id} />;
+    if (activeTab === 'support') return <SupportModule />;
+    if (activeTab === 'admin' && isAdmin) return <AdminPanel />;
 
-    if (activeTab === 'calculator') {
+    if (activeTab === 'hours') {
       return (
-        <div className="max-w-4xl mx-auto py-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-black text-slate-800 mb-2">Calculadora de Horas</h2>
-            <p className="text-slate-500">Proyecta tu cronograma de recuperación de forma sencilla.</p>
+        <div className="space-y-6">
+          {/* Sub-tabs internos de Control de Horas */}
+          <div className="flex gap-2 bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl mb-8 w-fit border border-slate-200/50 shadow-sm">
+            <button
+              onClick={() => setSubTab('dashboard')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${subTab === 'dashboard' ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20' : 'text-slate-500 hover:text-slate-700 hover:bg-white'}`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              Tablero
+            </button>
+            <button
+              onClick={() => setSubTab('calculator')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${subTab === 'calculator' ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20' : 'text-slate-500 hover:text-slate-700 hover:bg-white'}`}
+            >
+              <Calculator className="w-3.5 h-3.5" />
+              Calculadora
+            </button>
+            <button
+              onClick={() => setSubTab('history')}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${subTab === 'history' ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20' : 'text-slate-500 hover:text-slate-700 hover:bg-white'}`}
+            >
+              <History className="w-3.5 h-3.5" />
+              Historial
+            </button>
           </div>
-          <CalculatorTool />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-              <Clock className="w-10 h-10 text-primary-600 mb-4" />
-              <h3 className="font-bold text-slate-800 mb-2">Planificación Precisa</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">Calcula exactamente cuántos días te tomará cubrir tus horas según tu disponibilidad diaria.</p>
+          {subTab === 'calculator' ? (
+            <div className="max-w-4xl mx-auto py-4">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-black text-slate-800 mb-2">Calculadora de Horas</h2>
+                <p className="text-slate-500">Proyecta tu cronograma de recuperación de forma sencilla.</p>
+              </div>
+              <CalculatorTool />
             </div>
-            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-              <Calendar className="w-10 h-10 text-primary-600 mb-4" />
-              <h3 className="font-bold text-slate-800 mb-2">Excluye fines de semana</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">El sistema identifica automáticamente sábados y domingos para darte una fecha real de finalización.</p>
-            </div>
-            <div className="p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
-              <CheckCircle2 className="w-10 h-10 text-primary-600 mb-4" />
-              <h3 className="font-bold text-slate-800 mb-2">Meta Clara</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">Tener una fecha objetivo ayuda a mantener el compromiso con la recuperación de tus horas.</p>
-            </div>
-          </div>
+          ) : subTab === 'history' ? (
+            <PeriodHistory />
+          ) : (
+            <Dashboard
+              userId={user.id}
+              showCreate={showCreate}
+              onCreateDone={(newId) => {
+                setShowCreate(false);
+                if (newId && typeof newId === 'string') {
+                  setSelectedPeriodId(newId);
+                }
+              }}
+              viewPeriodId={selectedPeriodId}
+              onBackToActive={() => {
+                setSelectedPeriodId(null);
+                setShowCreate(false);
+              }}
+              onSelectPeriod={(id) => {
+                setSelectedPeriodId(id);
+                setShowCreate(false);
+              }}
+              onStartCreate={() => {
+                setSelectedPeriodId(null);
+                setShowCreate(true);
+              }}
+            />
+          )}
         </div>
       );
     }
 
-    if (showCreate) {
-      return (
-        <CreatePeriod
-          onCreate={(name) => {
-            // El Dashboard se encargará de crear el período
-            setShowCreate(false);
-            setActiveTab('dashboard');
-          }}
-        />
-      );
-    }
-
-    if (activeTab === 'history') {
-      return (
-        <PeriodHistory
-          userId={user.id}
-          onCreateNew={() => { setShowCreate(true); setActiveTab('dashboard'); }}
-        />
-      );
-    }
-
-    return (
-      <div className="space-y-8">
-        <Dashboard
-          userId={user.id}
-          showCreate={showCreate}
-          onCreateDone={() => setShowCreate(false)}
-        />
-      </div>
-    );
+    return null;
   };
 
   return (
     <Layout>
-      {/* Nav Tabs */}
-      <div className="flex gap-1 bg-white/60 backdrop-blur-sm border border-white/30 p-1.5 rounded-2xl mb-8 w-fit shadow-sm flex-wrap">
-        <button
-          onClick={() => { setActiveTab('dashboard'); setShowCreate(false); }}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'dashboard'
-            ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20'
-            : 'text-slate-600 hover:bg-white/80'
-            }`}
-        >
-          <LayoutDashboard className="w-4 h-4" />
-          Mi Control
-        </button>
-
-        <button
-          onClick={() => { setActiveTab('calculator'); setShowCreate(false); }}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'calculator'
-            ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20'
-            : 'text-slate-600 hover:bg-white/80'
-            }`}
-        >
-          <Calculator className="w-4 h-4" />
-          Calculadora
-        </button>
-
-        <button
-          onClick={() => { setActiveTab('history'); setShowCreate(false); }}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'history'
-            ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20'
-            : 'text-slate-600 hover:bg-white/80'
-            }`}
-        >
-          <History className="w-4 h-4" />
-          Historial
-        </button>
-
-        {isAdmin && (
+      {/* Navegación Principal: Los 3 Paneles Clave + Secundarios */}
+      <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+        <div className="flex gap-1.5 bg-white/60 backdrop-blur-md border border-white/40 p-1.5 rounded-[24px] shadow-sm flex-wrap">
           <button
-            onClick={() => { setActiveTab('admin'); setShowCreate(false); }}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'admin'
-              ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20'
+            id="nav-hours"
+            onClick={() => {
+              setActiveTab('hours');
+              setSubTab('dashboard');
+              setShowCreate(false);
+              setSelectedPeriodId(null);
+            }}
+            className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'hours'
+              ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
               : 'text-slate-600 hover:bg-white/80'
               }`}
           >
-            <Shield className="w-4 h-4" />
-            Admin
+            <LayoutDashboard className="w-4 h-4" />
+            Control de Horas
           </button>
-        )}
+
+          {(user.features?.vacations || isAdmin) && (
+            <button
+              id="nav-vacations"
+              onClick={() => { setActiveTab('vacations'); setShowCreate(false); }}
+              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'vacations'
+                ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
+                : 'text-slate-600 hover:bg-white/80'
+                }`}
+            >
+              <Palmtree className="w-4 h-4" />
+              Vacaciones
+            </button>
+          )}
+
+          {(user.features?.documents || isAdmin) && (
+            <button
+              id="nav-documents"
+              onClick={() => { setActiveTab('documents'); setShowCreate(false); }}
+              className={`flex items-center gap-2 px-6 py-3 rounded-[18px] text-sm font-black transition-all ${activeTab === 'documents'
+                ? 'bg-primary-700 text-white shadow-lg shadow-primary-900/20 scale-105'
+                : 'text-slate-600 hover:bg-white/80'
+                }`}
+            >
+              <FileText className="w-4 h-4" />
+              Boletas
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-1.5 bg-slate-100/30 p-1.5 rounded-[24px] border border-slate-200/30 flex-wrap">
+          <button
+            id="nav-support"
+            onClick={() => { setActiveTab('support'); setShowCreate(false); }}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-xs font-bold transition-all ${activeTab === 'support'
+              ? 'bg-slate-700 text-white shadow-md'
+              : 'text-slate-500 hover:bg-white/80'
+              }`}
+          >
+            <LifeBuoy className="w-4 h-4" />
+            Soporte
+          </button>
+
+          {isAdmin && (
+            <button
+              id="nav-admin"
+              onClick={() => { setActiveTab('admin'); setShowCreate(false); }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-[18px] text-xs font-bold transition-all ${activeTab === 'admin'
+                ? 'bg-slate-700 text-white shadow-md'
+                : 'text-slate-500 hover:bg-white/80'
+                }`}
+            >
+              <Shield className="w-4 h-4" />
+              Admin
+            </button>
+          )}
+        </div>
       </div>
 
       {renderContent()}
-    </Layout>
+    </Layout >
   );
 }
 
