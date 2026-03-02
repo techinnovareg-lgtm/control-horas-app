@@ -30,12 +30,21 @@ const DocumentModule = ({ userId }) => {
         e.preventDefault();
         if (!formData.file) return;
 
+        // Validación de tamaño (Límite aproximado por overhead de base64 en Firestore de 1MB)
+        // El tamaño de la cadena base64 es aproximadamente 4/3 del tamaño del archivo original
+        const fileSizeInMB = (formData.file.length * 0.75) / (1024 * 1024);
+        if (fileSizeInMB > 1.1) { // Dejamos un pequeño margen
+            alert('El archivo es demasiado grande (>1MB). Para respaldar documentos de mayor tamaño se requiere un plan con Storage configurado. Por favor, intenta con un archivo más ligero.');
+            return;
+        }
+
         try {
             await addDocument(formData.name, formData.year, formData.month, formData.file);
             setIsUploading(false);
             setFormData({ name: '', year: new Date().getFullYear(), month: new Date().getMonth() + 1, file: null });
         } catch (error) {
-            alert('Error al subir el documento');
+            console.error("Upload error details:", error);
+            alert(`Error al subir el documento: ${error.message || 'Error desconocido'}. Esto suele ocurrir si el servidor rechaza el tamaño del dato o faltan reglas de Firebase.`);
         }
     };
 

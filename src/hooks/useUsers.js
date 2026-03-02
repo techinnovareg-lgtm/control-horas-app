@@ -33,7 +33,7 @@ export const LICENSE_TYPES = {
 };
 
 export const PLANS = {
-    basic: { label: 'Básico', features: { vacations: false, documents: false }, color: 'slate' },
+    basic: { label: 'Básico', features: { vacations: false, documents: false }, color: 'blue' },
     essential: { label: 'Esencial', features: { vacations: true, documents: false }, color: 'primary' },
     pro: { label: 'Pro', features: { vacations: true, documents: true }, color: 'emerald' }
 };

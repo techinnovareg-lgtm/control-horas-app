@@ -70,7 +70,17 @@ function AppContent() {
               <CalculatorTool />
             </div>
           ) : subTab === 'history' ? (
-            <PeriodHistory />
+            <PeriodHistory
+              userId={user.id}
+              onCreateNew={() => {
+                setSubTab('dashboard');
+                setShowCreate(true);
+              }}
+              onViewPeriod={(id) => {
+                setSelectedPeriodId(id);
+                setSubTab('dashboard');
+              }}
+            />
           ) : (
             <Dashboard
               userId={user.id}

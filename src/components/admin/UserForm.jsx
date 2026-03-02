@@ -104,29 +104,38 @@ const UserForm = ({ onClose }) => {
                         <div>
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-3">Plan de Servicio</label>
                             <div className="grid grid-cols-1 gap-3">
-                                {Object.entries(PLANS).map(([key, val]) => (
-                                    <label
-                                        key={key}
-                                        className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${plan === key ? `border-${val.color}-500 bg-${val.color}-50 text-${val.color}-700` : 'border-slate-100 hover:border-slate-200 bg-white'}`}
-                                    >
-                                        <div className="flex flex-col">
-                                            <span className="text-sm font-black uppercase">{val.label}</span>
-                                            <span className="text-[10px] opacity-70">
-                                                {key === 'basic' && 'Solo Horas'}
-                                                {key === 'essential' && 'Horas + Vacaciones'}
-                                                {key === 'pro' && 'Horas + Vacaciones + Boletas'}
-                                            </span>
-                                        </div>
-                                        <input
-                                            type="radio"
-                                            name="plan"
-                                            checked={plan === key}
-                                            onChange={() => setPlan(key)}
-                                            className="hidden"
-                                        />
-                                        {plan === key && <CheckCircle2 className="w-5 h-5" />}
-                                    </label>
-                                ))}
+                                {Object.entries(PLANS).map(([key, val]) => {
+                                    const isActive = plan === key;
+                                    const colorMap = {
+                                        blue: isActive ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-100 hover:border-slate-200 bg-white text-slate-600',
+                                        primary: isActive ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-slate-100 hover:border-slate-200 bg-white text-slate-600',
+                                        emerald: isActive ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100 hover:border-slate-200 bg-white text-slate-600'
+                                    };
+
+                                    return (
+                                        <label
+                                            key={key}
+                                            className={`flex items-center justify-between p-4 rounded-2xl border-2 cursor-pointer transition-all ${colorMap[val.color]}`}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-black uppercase">{val.label}</span>
+                                                <span className="text-[10px] opacity-70">
+                                                    {key === 'basic' && 'Solo Horas'}
+                                                    {key === 'essential' && 'Horas + Vacaciones'}
+                                                    {key === 'pro' && 'Horas + Vacaciones + Boletas'}
+                                                </span>
+                                            </div>
+                                            <input
+                                                type="radio"
+                                                name="plan"
+                                                checked={plan === key}
+                                                onChange={() => setPlan(key)}
+                                                className="hidden"
+                                            />
+                                            {plan === key && <CheckCircle2 className="w-5 h-5" />}
+                                        </label>
+                                    );
+                                })}
                             </div>
                         </div>
 
