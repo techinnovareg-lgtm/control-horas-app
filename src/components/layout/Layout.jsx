@@ -12,17 +12,13 @@ const Layout = ({ children, sidebar }) => {
             {/* Sidebar Lateral */}
             <aside className="hidden lg:flex flex-col w-72 h-screen sticky top-0 bg-white/40 backdrop-blur-xl border-r border-slate-200/50 z-40">
                 {/* Logo Area */}
-                <div className="p-8">
-                    <div className="flex items-center gap-3">
+                <div className="p-6">
+                    <div className="flex justify-center w-full">
                         <img
                             src="./labora_logo.png"
                             alt="Labora"
-                            className="h-10 object-contain drop-shadow-sm"
+                            className="h-24 object-contain drop-shadow-lg scale-110"
                         />
-                        <div>
-                            <p className="text-sm font-black text-slate-800 tracking-tighter leading-none">Labora</p>
-                            <p className="text-[10px] text-primary-600 font-bold uppercase tracking-widest mt-1">Gestión Laboral</p>
-                        </div>
                     </div>
                 </div>
 
@@ -64,9 +60,8 @@ const Layout = ({ children, sidebar }) => {
             <div className="flex-1 flex flex-col h-screen overflow-hidden">
                 {/* Header (Simplificado para Mobile/Search/Notify) */}
                 <header className="h-16 lg:h-20 flex items-center justify-between px-6 lg:px-10 z-30 bg-white/20 backdrop-blur-sm lg:backdrop-blur-none border-b lg:border-none border-slate-200/50">
-                    <div className="lg:hidden flex items-center gap-3">
-                        <img src="./labora_logo.png" alt="Labora" className="h-8" />
-                        <span className="text-sm font-black text-slate-800">Labora</span>
+                    <div className="lg:hidden flex items-center justify-center">
+                        <img src="./labora_logo.png" alt="Labora" className="h-14 drop-shadow-sm" />
                     </div>
 
                     <div className="hidden lg:block">

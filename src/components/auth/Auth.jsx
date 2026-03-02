@@ -33,9 +33,9 @@ const PinVerification = ({ user, onComplete, onCancel }) => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4"
-            style={{ background: 'linear-gradient(135deg, #fdf8f0 0%, #ffffff 50%, #fce7ef 100%)' }}>
+            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #e0e7ff 100%)' }}>
             <div className="shadow-2xl p-8 rounded-3xl max-w-md w-full text-center"
-                style={{ background: 'linear-gradient(135deg, #4e0d28 0%, #8b1a4a 60%, #a8174a 100%)' }}>
+                style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #4f46e5 100%)' }}>
                 <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                     <ShieldCheck className="w-10 h-10 text-white" />
                 </div>
@@ -105,12 +105,12 @@ const SetPasswordScreen = ({ user, onComplete }) => {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4"
-            style={{ background: 'linear-gradient(135deg, #fdf8f0 0%, #ffffff 50%, #fce7ef 100%)' }}>
+            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #e0e7ff 100%)' }}>
             <div className="shadow-2xl p-8 rounded-3xl max-w-md w-full"
-                style={{ background: 'linear-gradient(135deg, #4e0d28 0%, #8b1a4a 60%, #a8174a 100%)' }}>
+                style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #4f46e5 100%)' }}>
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
-                    <img src="./logo-techinnova.png" alt="Tech Innova" className="h-16 object-contain drop-shadow-lg" />
+                    <img src="./labora_logo.png" alt="Labora" className="h-20 object-contain drop-shadow-lg" />
                 </div>
 
                 <div className="text-center mb-6">
@@ -220,24 +220,24 @@ const Auth = () => {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4"
-            style={{ background: 'linear-gradient(135deg, #fdf8f0 0%, #ffffff 50%, #fce7ef 100%)' }}>
+            style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 50%, #e0e7ff 100%)' }}>
 
             {/* Blobs decorativos suaves */}
             <div className="absolute top-0 left-0 w-96 h-96 rounded-full opacity-30 blur-3xl"
-                style={{ background: 'radial-gradient(circle, rgba(168,23,74,0.15), transparent)' }} />
+                style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.15), transparent)' }} />
             <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full opacity-20 blur-3xl"
-                style={{ background: 'radial-gradient(circle, rgba(249,240,224,0.8), transparent)' }} />
+                style={{ background: 'radial-gradient(circle, rgba(224,231,255,0.8), transparent)' }} />
 
             {/* Card de login — mantiene el color corporativo */}
             <div className="relative shadow-2xl shadow-primary-900/20 p-8 rounded-3xl max-w-md w-full"
-                style={{ background: 'linear-gradient(135deg, #4e0d28 0%, #8b1a4a 60%, #a8174a 100%)' }}>
+                style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #4f46e5 100%)' }}>
 
-                {/* Logo Tech Innova */}
-                <div className="flex justify-center mb-8">
+                {/* Logo Main */}
+                <div className="flex justify-center mb-8 bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20">
                     <img
-                        src="./logo-techinnova.png"
-                        alt="Tech Innova"
-                        className="h-20 object-contain drop-shadow-xl"
+                        src="./labora_logo.png"
+                        alt="Labora"
+                        className="h-24 object-contain drop-shadow-xl"
                     />
                 </div>
 
