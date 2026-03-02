@@ -47,9 +47,18 @@ const Layout = ({ children, sidebar }) => {
                         </button>
                     </div>
 
-                    <div className="mt-4 pt-4 flex flex-col items-center justify-center w-full px-4 text-center">
-                        <p className="text-[10px] text-slate-400 font-medium mb-1.5 uppercase tracking-wider">Desarrollado por</p>
-                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-16 h-16 object-contain rounded-xl shadow-sm drop-shadow-sm brightness-95 hover:brightness-100 transition-all duration-300" />
+                    <div className="mt-4 pt-4 flex items-center justify-start w-full px-2 border-t border-slate-200/50">
+                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-12 h-12 object-cover rounded-2xl shadow-sm drop-shadow-sm brightness-95 hover:brightness-100 transition-all duration-300" />
+                        <div className="ml-3 flex flex-col items-start overflow-hidden">
+                            <span className="text-sm font-bold text-slate-800 tracking-tight truncate w-full">Tech Innova</span>
+                            <span className="text-[10px] text-slate-500 font-medium truncate w-full mb-0.5">v1.1.0 · {new Date().getFullYear()}</span>
+                            <a href="#" className="flex items-center gap-1 text-[10px] text-primary-600 hover:text-primary-800 font-bold transition-colors">
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                Buscar actualizaciones
+                            </a>
+                        </div>
                     </div>
                 </div>
             </aside>
