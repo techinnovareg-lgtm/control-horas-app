@@ -15,8 +15,8 @@ const Layout = ({ children, sidebar }) => {
                 <div className="p-8">
                     <div className="flex items-center gap-3">
                         <img
-                            src="./logo-techinnova.png"
-                            alt="Tech Innova"
+                            src="./labora_logo.png"
+                            alt="Labora"
                             className="h-10 object-contain drop-shadow-sm"
                         />
                         <div>
@@ -33,6 +33,10 @@ const Layout = ({ children, sidebar }) => {
 
                 {/* Bottom User Area */}
                 <div className="p-4 border-t border-slate-200/50">
+                    <div className="flex flex-col items-center justify-center mb-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <img src="./logo-techinnova.png" alt="TechInnova" className="h-6 object-contain mb-1 grayscale hover:grayscale-0 transition-all" />
+                        <span className="text-[9px] font-bold text-slate-500 tracking-widest uppercase">Versión 1.1.0</span>
+                    </div>
                     <div className="bg-white/60 p-4 rounded-3xl border border-white/50 shadow-sm">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white text-sm font-black shadow-lg"
@@ -60,7 +64,7 @@ const Layout = ({ children, sidebar }) => {
                 {/* Header (Simplificado para Mobile/Search/Notify) */}
                 <header className="h-16 lg:h-20 flex items-center justify-between px-6 lg:px-10 z-30 bg-white/20 backdrop-blur-sm lg:backdrop-blur-none border-b lg:border-none border-slate-200/50">
                     <div className="lg:hidden flex items-center gap-3">
-                        <img src="./logo-techinnova.png" alt="Labora" className="h-8" />
+                        <img src="./labora_logo.png" alt="Labora" className="h-8" />
                         <span className="text-sm font-black text-slate-800">Labora</span>
                     </div>
 

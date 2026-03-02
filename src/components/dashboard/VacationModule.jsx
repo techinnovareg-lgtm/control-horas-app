@@ -21,6 +21,13 @@ const VacationModule = ({ userId }) => {
     const [calcRoute, setCalcRoute] = useState('30'); // '30' calendarios o '22' hábiles
     const stats = getStats(currentYear, calcRoute, 'administrativo'); // Mocking staffType for testing logic
 
+    // Helper para evitar el desfase por zona horaria (UTC)
+    const parseLocalDate = (dateString) => {
+        if (!dateString) return null;
+        const [year, month, day] = dateString.split('-');
+        return new Date(year, month - 1, day);
+    };
+
     const isBusinessDay = (date) => {
         const day = date.getDay();
         return day !== 0 && day !== 6; // 0: Sunday, 6: Saturday
@@ -28,8 +35,8 @@ const VacationModule = ({ userId }) => {
 
     const calculateDays = (start, end, route = '30') => {
         if (!start || !end) return 0;
-        const s = new Date(start);
-        const e = new Date(end);
+        const s = parseLocalDate(start);
+        const e = parseLocalDate(end);
 
         if (route === '22') {
             let count = 0;
@@ -230,7 +237,7 @@ const VacationModule = ({ userId }) => {
                                     <td className="px-8 py-5">
                                         <div className="font-bold text-slate-700 flex items-center gap-2">
                                             <Calendar className="w-4 h-4 text-slate-300" />
-                                            {new Date(vac.startDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - {new Date(vac.endDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {parseLocalDate(vac.startDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - {parseLocalDate(vac.endDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </div>
                                     </td>
                                     <td className="px-8 py-5 text-lg font-black text-slate-800">{vac.days} d</td>
