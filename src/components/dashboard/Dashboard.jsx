@@ -21,6 +21,8 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
         deletePeriod,
     } = usePeriods(userId);
 
+    const [showSelector, setShowSelector] = React.useState(false);
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -28,8 +30,6 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
             </div>
         );
     }
-
-    const [showSelector, setShowSelector] = React.useState(false);
 
     // El periodo a mostrar: el seleccionado (si existe) o el activo
     const targetPeriod = viewPeriodId
