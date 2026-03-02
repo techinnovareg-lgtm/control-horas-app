@@ -6,7 +6,7 @@ import {
     CreditCard, Key, RefreshCw, CheckCircle2, ChevronRight
 } from 'lucide-react';
 
-const SupportModule = () => {
+const SupportView = () => {
     const { user } = useAuth();
     const { getLicenseStatus, setUserPassword } = useUsers();
     const isAdmin = user?.role === 'admin';
@@ -223,4 +223,4 @@ const SupportModule = () => {
     );
 };
 
-export default SupportModule;
+export { SupportView };

@@ -12,7 +12,7 @@ import CalculatorTool from './components/dashboard/CalculatorTool';
 import VacationModule from './components/dashboard/VacationModule';
 import DocumentModule from './components/dashboard/DocumentModule';
 import SecurityModule from './components/dashboard/SecurityModule';
-import SupportModule from './components/dashboard/SupportModule';
+import { SupportView } from './components/dashboard/SupportModule';
 import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy, ShieldCheck } from 'lucide-react';
 
 function AppContent() {
@@ -31,7 +31,7 @@ function AppContent() {
   const renderContent = () => {
     if (activeTab === 'vacations') return <VacationModule userId={user.id} />;
     if (activeTab === 'documents') return <DocumentModule userId={user.id} />;
-    if (activeTab === 'support') return <SupportModule />;
+    if (activeTab === 'support') return <SupportView />;
     if (activeTab === 'security') return <SecurityModule />;
     if (activeTab === 'admin' && isAdmin) return <AdminPanel />;
 
