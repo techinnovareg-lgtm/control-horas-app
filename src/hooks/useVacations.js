@@ -49,27 +49,17 @@ export function useVacations(userId) {
         await deleteDoc(doc(db, 'vacations', vacationId));
     };
 
-    const getStats = (year) => {
+    const getStats = (year, route = '30', staffType = 'asistencial') => {
         const yearVacations = vacations.filter(v => new Date(v.startDate).getFullYear() === year);
         const totalUsed = yearVacations.reduce((acc, v) => acc + Number(v.days), 0);
 
-        // D.L. 1405 logic
-        const flexibleUsed = yearVacations
-            .filter(v => v.type === 'flexible')
-            .reduce((acc, v) => acc + Number(v.days), 0);
-
-        const blocksUsed = yearVacations
-            .filter(v => v.type === 'block')
-            .reduce((acc, v) => acc + Number(v.days), 0);
+        const totalAllowed = (staffType === 'administrativo' && route === '22') ? 22 : 30;
 
         return {
-            total: 30,
+            total: totalAllowed,
             used: totalUsed,
-            remaining: 30 - totalUsed,
-            flexibleUsed,
-            flexibleRemaining: 7 - flexibleUsed,
-            blocksUsed,
-            blocksRemaining: 23 - blocksUsed
+            remaining: totalAllowed - totalUsed,
+            isRoute22: route === '22'
         };
     };
 

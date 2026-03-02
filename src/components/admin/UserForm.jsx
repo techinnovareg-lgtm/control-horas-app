@@ -8,6 +8,7 @@ const UserForm = ({ onClose }) => {
     const [email, setEmail] = useState('');
     const [licenseType, setLicenseType] = useState('annual');
     const [plan, setPlan] = useState('basic');
+    const [staffType, setStaffType] = useState('asistencial');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
 
@@ -18,7 +19,7 @@ const UserForm = ({ onClose }) => {
         setError('');
         setIsSubmitting(true);
         try {
-            await createUser({ name: name.trim(), email: email.trim(), licenseType, plan });
+            await createUser({ name: name.trim(), email: email.trim(), licenseType, plan, staffType });
             setSuccess(true);
             setTimeout(() => onClose(), 1500);
         } catch (err) {
@@ -30,7 +31,7 @@ const UserForm = ({ onClose }) => {
 
     return (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
                     <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <UserPlus className="w-5 h-5 text-primary-600" />
@@ -84,21 +85,37 @@ const UserForm = ({ onClose }) => {
                             <p className="text-xs text-slate-400 mt-1">Este será el usuario de acceso al sistema.</p>
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Período de Licencia</label>
-                            <div className="relative">
-                                <Calendar className="absolute left-3 top-2.5 w-5 h-5 text-slate-400" />
-                                <select
-                                    value={licenseType}
-                                    onChange={e => setLicenseType(e.target.value)}
-                                    className="input-field pl-10"
-                                >
-                                    {Object.entries(LICENSE_TYPES).map(([key, val]) => (
-                                        <option key={key} value={key}>
-                                            {val.label} ({val.days} días)
-                                        </option>
-                                    ))}
-                                </select>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Licencia</label>
+                                <div className="relative">
+                                    <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                    <select
+                                        value={licenseType}
+                                        onChange={e => setLicenseType(e.target.value)}
+                                        className="input-field pl-10 text-sm"
+                                    >
+                                        {Object.entries(LICENSE_TYPES).map(([key, val]) => (
+                                            <option key={key} value={key}>
+                                                {val.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo Personal</label>
+                                <div className="relative">
+                                    <Palmtree className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                                    <select
+                                        value={staffType}
+                                        onChange={e => setStaffType(e.target.value)}
+                                        className="input-field pl-10 text-sm"
+                                    >
+                                        <option value="asistencial">Asistencial</option>
+                                        <option value="administrativo">Administrativo</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div>

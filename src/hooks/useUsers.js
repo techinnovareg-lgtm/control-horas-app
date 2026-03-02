@@ -94,6 +94,7 @@ export function useUsers() {
                     mustChangePassword: false,
                     plan: 'pro',
                     features: PLANS.pro.features,
+                    staffType: 'administrativo',
                     contractStart: new Date().toISOString(),
                     contractEnd: new Date(Date.now() + 365 * 86400000).toISOString(),
                     createdAt: new Date().toISOString(),
@@ -136,7 +137,7 @@ export function useUsers() {
         };
     };
 
-    const createUser = async ({ name, email, licenseType, plan = 'basic' }) => {
+    const createUser = async ({ name, email, licenseType, plan = 'basic', staffType = 'asistencial' }) => {
         const emailLower = email.toLowerCase().trim();
         if (users.some(u => u.email && u.email.toLowerCase() === emailLower)) {
             throw new Error('Ya existe un usuario con ese correo.');
@@ -155,6 +156,7 @@ export function useUsers() {
             status: 'active',
             mustSetPassword: true,
             plan,
+            staffType,
             features: PLANS[plan]?.features || PLANS.basic.features,
             licenseType,
             licenseHistory: [{ type: licenseType, startDate, endDate, createdAt: startDate }],
