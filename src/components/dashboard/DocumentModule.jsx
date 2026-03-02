@@ -33,6 +33,8 @@ const DocumentModule = ({ userId }) => {
         }
     };
 
+    const [sortOrder, setSortOrder] = useState('date'); // 'name', 'date'
+
     const handleUpload = async (e) => {
         e.preventDefault();
         if (!formData.file) {
@@ -58,7 +60,20 @@ const DocumentModule = ({ userId }) => {
     };
 
     const years = [...new Set(documents.map(d => d.year))].sort((a, b) => b - a);
-    const filteredDocs = documents.filter(d => d.year === Number(filterYear));
+
+    // Logic for sorting and filtering
+    const sortedAndFilteredDocs = documents
+        .filter(d => d.year === Number(filterYear))
+        .sort((a, b) => {
+            if (sortOrder === 'name') {
+                return a.name.localeCompare(b.name);
+            } else {
+                // Sort by createdAt (upload date) or by year/month as fallback
+                const dateA = a.createdAt ? new Date(a.createdAt) : new Date(a.year, a.month - 1);
+                const dateB = b.createdAt ? new Date(b.createdAt) : new Date(b.year, b.month - 1);
+                return dateB - dateA; // Most recent first
+            }
+        });
 
     const getMonthName = (m) => {
         return new Intl.DateTimeFormat('es', { month: 'long' }).format(new Date(2024, m - 1));
@@ -191,23 +206,11 @@ const DocumentModule = ({ userId }) => {
                 </div>
             )}
 
-            <div className="flex items-center gap-4 bg-slate-100/50 p-2 rounded-2xl w-fit">
-                <Search className="w-4 h-4 text-slate-400 ml-2" />
-                <div className="flex gap-2">
-                    {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
-                        <button
-                            key={year}
-                            onClick={() => setFilterYear(year)}
-                            className={`px-4 py-1.5 rounded-xl text-sm font-bold transition-all ${filterYear === year ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                                }`}
-                        >
-                            {year}
-                        </button>
-                    ))}
-                    {!years.includes(new Date().getFullYear()) &&
-                        !years.includes(new Date().getFullYear() - 1) &&
-                        !years.includes(new Date().getFullYear() - 2) &&
-                        years.map(year => (
+            <div className="flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-4 bg-slate-100/50 p-2 rounded-2xl w-fit">
+                    <Search className="w-4 h-4 text-slate-400 ml-2" />
+                    <div className="flex gap-2">
+                        {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
                             <button
                                 key={year}
                                 onClick={() => setFilterYear(year)}
@@ -217,17 +220,33 @@ const DocumentModule = ({ userId }) => {
                                 {year}
                             </button>
                         ))}
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 bg-slate-100/50 p-2 rounded-2xl">
+                    <button
+                        onClick={() => setSortOrder('date')}
+                        className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === 'date' ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        Más Recientes
+                    </button>
+                    <button
+                        onClick={() => setSortOrder('name')}
+                        className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${sortOrder === 'name' ? 'bg-white text-primary-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        Nombre (A-Z)
+                    </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredDocs.length === 0 ? (
+                {sortedAndFilteredDocs.length === 0 ? (
                     <div className="col-span-full py-20 text-center">
                         <Folder className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                         <p className="text-slate-400 font-medium">No hay boletas registradas para el año {filterYear}</p>
                     </div>
                 ) : (
-                    filteredDocs.map(doc => (
+                    sortedAndFilteredDocs.map(doc => (
                         <div key={doc.id} className="glass-card p-5 rounded-3xl group hover:border-primary-200 transition-all">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">

@@ -217,7 +217,9 @@ const UserRow = ({ user }) => {
                                             key={key}
                                             onClick={() => updateUser(user.id, { plan: key, features: val.features })}
                                             className={`flex items-center gap-2 px-3 py-2 rounded-xl border transition-all ${user.plan === key
-                                                ? `bg-${val.color === 'primary' ? 'primary-600' : val.color === 'emerald' ? 'emerald-600' : 'slate-600'} border-transparent text-white shadow-md`
+                                                ? (key === 'basic' ? 'bg-slate-700 border-transparent text-white shadow-md' :
+                                                    key === 'essential' ? 'bg-primary-600 border-transparent text-white shadow-md' :
+                                                        'bg-emerald-600 border-transparent text-white shadow-md')
                                                 : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300'}`}
                                         >
                                             <span className="text-xs font-bold uppercase">{val.label}</span>
