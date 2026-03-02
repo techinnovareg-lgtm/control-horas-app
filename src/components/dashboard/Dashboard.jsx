@@ -8,54 +8,41 @@ import { exportToExcel, exportToPDF } from '../../utils/exportUtils';
 import { Archive, FileSpreadsheet, FileText, ArrowLeft, Plus, ChevronDown, Trash2, Clock, CheckCircle2, History } from 'lucide-react';
 
 const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBackToActive, onSelectPeriod, onStartCreate }) => {
+    // 1. Hooks siempre al inicio
     const {
         periods,
         activePeriod,
         loading,
-        createPeriod,
         addEntry,
-        editEntry,
         deleteEntry,
-        getPeriodStats,
+        editEntry,
+        createPeriod,
         archivePeriod,
+        getPeriodStats,
         deletePeriod,
     } = usePeriods(userId);
 
     const [showSelector, setShowSelector] = React.useState(false);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center py-20">
-                <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
-    }
-
-    // El periodo a mostrar: el seleccionado (si existe) o el activo
+    // 2. Cálculos derivados (después de todos los hooks)
     const targetPeriod = viewPeriodId
         ? periods.find(p => p.id === viewPeriodId)
         : activePeriod;
 
+    const stats = targetPeriod ? getPeriodStats(targetPeriod) : { owed: 0, recovered: 0, balance: 0 };
     const isArchived = targetPeriod?.status === 'archived';
 
-    // Si se solicita crear y no hay período activo → mostrar formulario de creación
-    if ((!targetPeriod && !loading && !periods.length) || (showCreate && !viewPeriodId)) {
+    // 3. Early return para loading (después de hooks)
+    if (loading) {
         return (
-            <CreatePeriod
-                onCreate={async (name) => {
-                    const newPeriod = await createPeriod(name);
-                    if (newPeriod?.id) {
-                        onCreateDone?.(newPeriod.id);
-                    } else {
-                        onCreateDone?.();
-                    }
-                }}
-            />
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+                <div className="w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-slate-500 font-medium font-mono text-xs uppercase tracking-widest">Sincronizando con la nube...</p>
+            </div>
         );
     }
 
-    const stats = targetPeriod ? getPeriodStats(targetPeriod) : null;
-
+    // Handlers
     const handleAddEntry = async (type, data) => {
         try {
             const result = await addEntry(type, data, targetPeriod.id);
@@ -82,8 +69,28 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
         }
     };
 
+    // Si se solicita crear o no hay períodos
+    if ((!targetPeriod && !periods.length) || (showCreate && !viewPeriodId)) {
+        return (
+            <div className="space-y-6">
+                <div className="flex items-center gap-3">
+                    <button onClick={onBackToActive} className="p-2 hover:bg-slate-100 rounded-xl transition-all">
+                        <ArrowLeft className="w-5 h-5 text-slate-400" />
+                    </button>
+                    <h2 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Nuevo Período</h2>
+                </div>
+                <CreatePeriod
+                    onCreate={async (name) => {
+                        const newId = await createPeriod(name);
+                        onCreateDone?.(newId?.id || null);
+                    }}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header del período */}
             <div className="flex flex-wrap justify-between items-start gap-3">
                 <div className="flex items-center gap-3">
@@ -117,7 +124,7 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
                             )}
                         </div>
 
-                        {/* Period Selector Dropdown (Click Based) */}
+                        {/* Period Selector Dropdown */}
                         {showSelector && (
                             <>
                                 <div className="fixed inset-0 z-40" onClick={() => setShowSelector(false)} />

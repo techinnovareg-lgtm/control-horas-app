@@ -12,6 +12,7 @@ import CalculatorTool from './components/dashboard/CalculatorTool';
 import VacationModule from './components/dashboard/VacationModule';
 import DocumentModule from './components/dashboard/DocumentModule';
 import SecurityModule from './components/dashboard/SecurityModule';
+import SupportModule from './components/dashboard/SupportModule';
 import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy, ShieldCheck } from 'lucide-react';
 
 function AppContent() {
@@ -226,8 +227,10 @@ function AppContent() {
   );
 }
 
-export default () => (
+const App = () => (
   <AuthProvider>
     <AppContent />
   </AuthProvider>
 );
+
+export default App;
