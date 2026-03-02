@@ -29,6 +29,8 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
         );
     }
 
+    const [showSelector, setShowSelector] = React.useState(false);
+
     // El periodo a mostrar: el seleccionado (si existe) o el activo
     const targetPeriod = viewPeriodId
         ? periods.find(p => p.id === viewPeriodId)
@@ -94,46 +96,74 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
                             {activePeriod ? 'Volver al Activo' : 'Panel de Inicio'}
                         </button>
                     )}
-                    <div className="relative group">
-                        <div className="flex items-baseline gap-2">
-                            <h2 className="text-2xl font-bold text-slate-800">{targetPeriod?.name || 'Selecciona un Periodo'}</h2>
-                            <div className="bg-slate-100 p-1 rounded-lg cursor-pointer hover:bg-slate-200 transition-colors">
-                                <ChevronDown className="w-4 h-4 text-slate-500" />
-                            </div>
+                    <div className="relative">
+                        <div className="flex flex-col">
+                            <button
+                                onClick={() => setShowSelector(!showSelector)}
+                                className="flex items-center gap-2 group text-left"
+                            >
+                                <h2 className="text-2xl font-black text-slate-800 group-hover:text-primary-700 transition-colors uppercase tracking-tight">
+                                    {targetPeriod?.name || 'Escoger Periodo'}
+                                </h2>
+                                <div className={`p-1.5 rounded-lg transition-all ${showSelector ? 'bg-primary-600 text-white rotate-180' : 'bg-slate-100 text-slate-500 group-hover:bg-primary-50 group-hover:text-primary-600'}`}>
+                                    <ChevronDown className="w-4 h-4" />
+                                </div>
+                            </button>
+
+                            {targetPeriod && (
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest mt-1 w-fit ${isArchived ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                                    {isArchived ? `Completado` : 'En Progreso'}
+                                </span>
+                            )}
                         </div>
 
-                        {/* Period Selector Dropdown */}
-                        <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                            <p className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tus Periodos</p>
-                            <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                                {periods.map(p => (
-                                    <button
-                                        key={p.id}
-                                        onClick={() => onSelectPeriod?.(p.id)}
-                                        className={`w-full text-left px-3 py-2 rounded-xl text-sm transition-all flex items-center justify-between ${targetPeriod?.id === p.id ? 'bg-primary-50 text-primary-700 font-bold' : 'hover:bg-slate-50 text-slate-600'}`}
-                                    >
-                                        <span className="truncate">{p.name}</span>
-                                        <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${p.status === 'archived' ? 'bg-slate-100 text-slate-500' : 'bg-green-100 text-green-700'}`}>
-                                            {p.status === 'archived' ? 'Arch.' : 'Act.'}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="border-t border-slate-50 mt-2 pt-2">
-                                <button
-                                    onClick={() => onStartCreate?.()}
-                                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-primary-600 font-bold hover:bg-primary-50 transition-all"
-                                >
-                                    <Plus className="w-4 h-4" />
-                                    Nuevo Período
-                                </button>
-                            </div>
-                        </div>
-
-                        {targetPeriod && (
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${isArchived ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
-                                {isArchived ? `Archivado ${targetPeriod.completedAt && `el ${new Date(targetPeriod.completedAt).toLocaleDateString()}`}` : 'En Progreso'}
-                            </span>
+                        {/* Period Selector Dropdown (Click Based) */}
+                        {showSelector && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowSelector(false)} />
+                                <div className="absolute top-full left-0 mt-3 w-72 bg-white rounded-[24px] shadow-2xl border border-slate-100 p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="flex items-center justify-between px-3 py-2 mb-2">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tus Periodos</p>
+                                        <History className="w-3 h-3 text-slate-300" />
+                                    </div>
+                                    <div className="max-h-64 overflow-y-auto custom-scrollbar space-y-1">
+                                        {periods.length === 0 ? (
+                                            <p className="text-xs text-slate-400 text-center py-4 italic px-4">No tienes periodos creados aún.</p>
+                                        ) : periods.map(p => (
+                                            <button
+                                                key={p.id}
+                                                onClick={() => {
+                                                    onSelectPeriod?.(p.id);
+                                                    setShowSelector(false);
+                                                }}
+                                                className={`w-full text-left px-4 py-3 rounded-2xl text-sm transition-all flex items-center justify-between border-2 ${targetPeriod?.id === p.id
+                                                    ? 'bg-primary-700 border-primary-700 text-white shadow-lg shadow-primary-900/20'
+                                                    : 'bg-slate-50 border-transparent hover:border-primary-100 hover:bg-white text-slate-600 shadow-sm'}`}
+                                            >
+                                                <div className="flex flex-col overflow-hidden">
+                                                    <span className="truncate font-bold">{p.name}</span>
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest opacity-60`}>
+                                                        {p.status === 'archived' ? 'Histórico' : 'Vigente'}
+                                                    </span>
+                                                </div>
+                                                {targetPeriod?.id === p.id && <CheckCircle2 className="w-4 h-4 shrink-0" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="border-t border-slate-50 mt-3 pt-3">
+                                        <button
+                                            onClick={() => {
+                                                onStartCreate?.();
+                                                setShowSelector(false);
+                                            }}
+                                            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-sm text-primary-700 font-black bg-primary-50 hover:bg-primary-100 transition-all uppercase tracking-wider"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Nuevo Período
+                                        </button>
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
                 </div>

@@ -11,8 +11,8 @@ import AdminPanel from './components/admin/AdminPanel';
 import CalculatorTool from './components/dashboard/CalculatorTool';
 import VacationModule from './components/dashboard/VacationModule';
 import DocumentModule from './components/dashboard/DocumentModule';
-import SupportModule from './components/dashboard/SupportModule';
-import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy } from 'lucide-react';
+import SecurityModule from './components/dashboard/SecurityModule';
+import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy, ShieldCheck } from 'lucide-react';
 
 function AppContent() {
   const { user } = useAuth();
@@ -31,6 +31,7 @@ function AppContent() {
     if (activeTab === 'vacations') return <VacationModule userId={user.id} />;
     if (activeTab === 'documents') return <DocumentModule userId={user.id} />;
     if (activeTab === 'support') return <SupportModule />;
+    if (activeTab === 'security') return <SecurityModule />;
     if (activeTab === 'admin' && isAdmin) return <AdminPanel />;
 
     if (activeTab === 'hours') {
@@ -184,6 +185,19 @@ function AppContent() {
               <LifeBuoy className="w-4 h-4" />
             </div>
             Soporte
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('security'); setShowCreate(false); }}
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'security'
+              ? 'bg-slate-100 text-slate-900 shadow-sm'
+              : 'text-slate-600 hover:bg-white hover:text-slate-900'
+              }`}
+          >
+            <div className={`p-2 rounded-xl transition-all ${activeTab === 'security' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-500'}`}>
+              <ShieldCheck className="w-4 h-4" />
+            </div>
+            Privacidad
           </button>
 
           {isAdmin && (
