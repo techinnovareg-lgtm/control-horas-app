@@ -7,6 +7,9 @@ import { CheckCircle2, Clock, PlusCircle, Trash2 } from 'lucide-react';
 const PeriodHistory = ({ userId, onCreateNew, onViewPeriod }) => {
     const { periods, getPeriodStats, loading, deletePeriod } = usePeriods(userId);
 
+    const sortedPeriods = [...periods]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -14,9 +17,6 @@ const PeriodHistory = ({ userId, onCreateNew, onViewPeriod }) => {
             </div>
         );
     }
-
-    const sortedPeriods = [...periods]
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     return (
         <div className="space-y-6">
