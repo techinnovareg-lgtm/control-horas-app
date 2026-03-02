@@ -48,7 +48,9 @@ const Layout = ({ children, sidebar }) => {
                     </div>
 
                     <div className="mt-4 pt-4 flex items-center justify-start w-full px-2 border-t border-slate-200/50">
-                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-12 h-12 object-cover rounded-2xl shadow-sm drop-shadow-sm brightness-95 hover:brightness-100 transition-all duration-300" />
+                        <a href="https://tech-innova.vercel.app/#inicio" target="_blank" rel="noopener noreferrer" className="block shrink-0">
+                            <img src="./logo-techinnova.png" alt="TechInnova" className="w-12 h-12 object-cover rounded-2xl shadow-sm drop-shadow-sm brightness-95 hover:brightness-100 hover:scale-105 transition-all duration-300" />
+                        </a>
                         <div className="ml-3 flex flex-col items-start overflow-hidden">
                             <span className="text-sm font-bold text-slate-800 tracking-tight truncate w-full">Tech Innova</span>
                             <span className="text-[10px] text-slate-500 font-medium truncate w-full mb-0.5">v1.1.0 · {new Date().getFullYear()}</span>

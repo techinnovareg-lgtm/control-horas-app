@@ -209,11 +209,16 @@ const SupportView = () => {
 
                     <div className="p-8 rounded-[40px] bg-primary-600 text-white shadow-xl shadow-primary-900/20 relative overflow-hidden group">
                         <div className="relative z-10">
-                            <h4 className="text-lg font-bold mb-2">¿Necesitas algo más?</h4>
-                            <p className="text-primary-100 text-sm leading-relaxed mb-4">Estamos aquí para resolver cualquier duda técnica o administrativa.</p>
-                            <button className="flex items-center gap-2 text-white font-black group-hover:gap-4 transition-all">
-                                Ayuda Central <ChevronRight className="w-5 h-5" />
-                            </button>
+                            <h4 className="text-lg font-bold mb-2">Renueva o Mejora tu Plan</h4>
+                            <p className="text-primary-100 text-sm leading-relaxed mb-6">Explora nuestros planes Labora directamente desde nuestra tienda oficial y solicita la mejora de tu suscripción.</p>
+                            <a
+                                href="https://tech-innova.vercel.app/tienda"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-white font-black group-hover:gap-4 transition-all"
+                            >
+                                Ir a la Tienda Oficial <ChevronRight className="w-5 h-5" />
+                            </a>
                         </div>
                         <div className="absolute top-[-50%] right-[-50%] w-full h-full bg-white/10 rounded-full blur-[80px]" />
                     </div>
