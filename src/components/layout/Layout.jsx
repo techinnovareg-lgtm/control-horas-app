@@ -49,9 +49,8 @@ const Layout = ({ children, sidebar }) => {
                         </button>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center w-full px-4 py-2 bg-slate-100/50 rounded-2xl border border-slate-200/50 opacity-60 hover:opacity-100 transition-opacity">
-                        <img src="./logo-techinnova.png" alt="TechInnova" className="h-4 w-full object-contain mb-1 grayscale hover:grayscale-0 transition-all opacity-80 hover:opacity-100" />
-                        <span className="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Versión 1.1.0</span>
+                    <div className="mt-4 pt-4 flex flex-col items-center justify-center w-full px-4 border-t border-slate-200/50 opacity-80 hover:opacity-100 transition-opacity">
+                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-[85%] h-auto object-contain mb-2 rounded-xl shadow-sm drop-shadow-sm hover:scale-105 transition-all duration-300" />
                     </div>
                 </div>
             </aside>
