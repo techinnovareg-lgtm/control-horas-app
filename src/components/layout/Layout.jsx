@@ -12,14 +12,12 @@ const Layout = ({ children, sidebar }) => {
             {/* Sidebar Lateral */}
             <aside className="hidden lg:flex flex-col w-72 h-screen sticky top-0 bg-white/40 backdrop-blur-xl border-r border-slate-200/50 z-40">
                 {/* Logo Area */}
-                <div className="p-6">
-                    <div className="flex justify-center w-full">
-                        <img
-                            src="./labora_logo.png"
-                            alt="Labora"
-                            className="h-24 object-contain drop-shadow-lg scale-110"
-                        />
-                    </div>
+                <div className="p-8 flex items-center justify-center">
+                    <img
+                        src="./labora_logo.png"
+                        alt="Labora"
+                        className="w-full max-w-[180px] h-auto object-contain drop-shadow-md"
+                    />
                 </div>
 
                 {/* Navigation Slot */}
@@ -49,8 +47,9 @@ const Layout = ({ children, sidebar }) => {
                         </button>
                     </div>
 
-                    <div className="mt-4 pt-4 flex flex-col items-center justify-center w-full px-4 border-t border-slate-200/50 opacity-80 hover:opacity-100 transition-opacity">
-                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-[85%] h-auto object-contain mb-2 rounded-xl shadow-sm drop-shadow-sm hover:scale-105 transition-all duration-300" />
+                    <div className="mt-4 pt-4 flex flex-col items-center justify-center w-full px-4 text-center">
+                        <p className="text-[10px] text-slate-400 font-medium mb-1.5 uppercase tracking-wider">Desarrollado por</p>
+                        <img src="./logo-techinnova.png" alt="TechInnova" className="w-16 h-16 object-contain rounded-xl shadow-sm drop-shadow-sm brightness-95 hover:brightness-100 transition-all duration-300" />
                     </div>
                 </div>
             </aside>

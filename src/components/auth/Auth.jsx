@@ -233,11 +233,11 @@ const Auth = () => {
                 style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 60%, #4f46e5 100%)' }}>
 
                 {/* Logo Main */}
-                <div className="flex justify-center mb-8 bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20">
+                <div className="flex justify-center mb-8">
                     <img
                         src="./labora_logo.png"
                         alt="Labora"
-                        className="h-24 object-contain drop-shadow-xl"
+                        className="h-24 object-contain drop-shadow-2xl"
                     />
                 </div>
 
