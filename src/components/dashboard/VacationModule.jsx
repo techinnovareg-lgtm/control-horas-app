@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useVacations } from '../../hooks/useVacations';
-import { Palmtree, Calendar, Plus, Trash2 } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { Palmtree, Calendar, Plus, Trash2, UserPlus, Users } from 'lucide-react';
 
 const VacationModule = ({ userId }) => {
     // 1. Hooks siempre al inicio
+    const { user } = useAuth();
     const { vacations, loading, addVacation, deleteVacation, getStats } = useVacations(userId);
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({
@@ -15,11 +17,10 @@ const VacationModule = ({ userId }) => {
 
     // 2. Cálculos derivados
     const currentYear = new Date().getFullYear();
-    const userRole = vacations[0]?.userRole; // Mocking role detection if not passed
-    // We should ideally have the full user object. Let's assume we can get it from vacations or props
-    // For now, let's add a route selector state
     const [calcRoute, setCalcRoute] = useState('30'); // '30' calendarios o '22' hábiles
-    const stats = getStats(currentYear, calcRoute, 'administrativo'); // Mocking staffType for testing logic
+    const [selectedStaffType, setSelectedStaffType] = useState(user?.staffType || 'asistencial');
+
+    const stats = getStats(currentYear, calcRoute, selectedStaffType);
 
     // Helper para evitar el desfase por zona horaria (UTC)
     const parseLocalDate = (dateString) => {
@@ -120,19 +121,37 @@ const VacationModule = ({ userId }) => {
 
                 <div className="glass-card p-6 rounded-[32px] border-b-4 border-b-emerald-500 transition-all hover:-translate-y-1">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Configuración de Cálculo</p>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setCalcRoute('30')}
-                            className={`flex-1 py-3 rounded-2xl text-xs font-bold transition-all ${calcRoute === '30' ? 'bg-primary-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                        >
-                            Ruta 30 (Calendario)
-                        </button>
-                        <button
-                            onClick={() => setCalcRoute('22')}
-                            className={`flex-1 py-3 rounded-2xl text-xs font-bold transition-all ${calcRoute === '22' ? 'bg-primary-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                        >
-                            Ruta 22 (Hábiles)
-                        </button>
+                    <div className="flex flex-col gap-4">
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setSelectedStaffType('asistencial')}
+                                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedStaffType === 'asistencial' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            >
+                                <Users className="w-3.5 h-3.5" />
+                                Asistencial
+                            </button>
+                            <button
+                                onClick={() => setSelectedStaffType('administrativo')}
+                                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${selectedStaffType === 'administrativo' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            >
+                                <UserPlus className="w-3.5 h-3.5" />
+                                Administrativo
+                            </button>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setCalcRoute('30')}
+                                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all ${calcRoute === '30' ? 'bg-primary-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            >
+                                Ruta 30 (Calendario)
+                            </button>
+                            <button
+                                onClick={() => setCalcRoute('22')}
+                                className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider transition-all ${calcRoute === '22' ? 'bg-primary-600 text-white shadow-lg' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                            >
+                                Ruta 22 (Hábiles)
+                            </button>
+                        </div>
                     </div>
                     <p className="text-[10px] text-slate-400 mt-3 italic">
                         {calcRoute === '30' ? '* Incluye sábados y domingos en el conteo.' : '* Solo cuenta de Lunes a Viernes (Ideal para administrativos).'}

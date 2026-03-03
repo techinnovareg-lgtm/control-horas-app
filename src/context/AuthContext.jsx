@@ -20,6 +20,9 @@ export const AuthProvider = ({ children }) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            staffType: user.staffType,
+            plan: user.plan,
+            features: user.features,
             loggedInAt: new Date().toISOString(),
         });
     };
