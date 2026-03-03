@@ -34,6 +34,7 @@ export const LICENSE_TYPES = {
 
 export const PLANS = {
     basic: { label: 'Básico', features: { vacations: false, documents: false }, color: 'blue' },
+    basic_promo: { label: 'Básico Promo', features: { vacations: true, documents: true }, color: 'indigo' },
     essential: { label: 'Esencial', features: { vacations: true, documents: false }, color: 'primary' },
     pro: { label: 'Pro', features: { vacations: true, documents: true }, color: 'emerald' }
 };
@@ -144,7 +145,7 @@ export function useUsers() {
         }
 
         const startDate = new Date().toISOString();
-        const days = LICENSE_TYPES[licenseType]?.days || 30;
+        const days = plan === 'basic_promo' ? 30 : (LICENSE_TYPES[licenseType]?.days || 30);
         const endDate = new Date(Date.now() + days * 86400000).toISOString();
         const userId = generateId();
 
@@ -355,6 +356,54 @@ export function useUsers() {
         return false;
     };
 
+    /**
+     * Revisa vencimientos de planes, envía notificaciones y realiza downgrades si es necesario.
+     */
+    const checkPlanExpiries = async (user) => {
+        if (!user || user.role === 'admin') return null;
+
+        const status = getLicenseStatus(user);
+        const now = new Date();
+        const endDate = new Date(status.endDate);
+        const daysLeft = status.daysLeft;
+
+        const userRef = doc(db, 'users', user.id);
+        const updates = {};
+
+        // 1. Caso: El plan ha vencido hoy o antes
+        if (!status.active && daysLeft <= 0) {
+            // Si es Básico Promo, degradar a Básico
+            if (user.plan === 'basic_promo') {
+                updates.plan = 'basic';
+                updates.features = PLANS.basic.features;
+            }
+
+            // Notificar vencimiento si no se ha notificado hoy
+            const todayStr = now.toISOString().split('T')[0];
+            if (user.lastExpiryNotify !== todayStr) {
+                const { sendPlanNotification } = await import('../utils/emailUtils');
+                await sendPlanNotification('expired', user, 0);
+                updates.lastExpiryNotify = todayStr;
+            }
+        }
+        // 2. Caso: Faltan 3 días o menos para vencer
+        else if (status.active && daysLeft <= 3) {
+            const todayStr = now.toISOString().split('T')[0];
+            if (user.lastWarningNotify !== todayStr) {
+                const { sendPlanNotification } = await import('../utils/emailUtils');
+                await sendPlanNotification('warning', user, daysLeft);
+                updates.lastWarningNotify = todayStr;
+            }
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await updateDoc(userRef, updates);
+            return { ...user, ...updates }; // Retornar user actualizado para refrescar sesión
+        }
+
+        return null;
+    };
+
     return {
         users,
         loading,
@@ -372,6 +421,7 @@ export function useUsers() {
         updateAdminSecurity,
         validateAdminPin,
         extendLicense,
+        checkPlanExpiries,
     };
 }
 

@@ -138,6 +138,7 @@ const UserForm = ({ onClose }) => {
                                                 <span className="text-sm font-black uppercase">{val.label}</span>
                                                 <span className="text-[10px] opacity-70">
                                                     {key === 'basic' && 'Solo Horas'}
+                                                    {key === 'basic_promo' && 'PRO Full (1 mes prueba)'}
                                                     {key === 'essential' && 'Horas + Vacaciones'}
                                                     {key === 'pro' && 'Horas + Vacaciones + Boletas'}
                                                 </span>

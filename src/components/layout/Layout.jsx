@@ -1,9 +1,25 @@
 import React from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { LogOut, Shield } from 'lucide-react';
+import { useUsers, PLANS } from '../../hooks/useUsers';
+import { LogOut, Shield, Zap, AlertTriangle, Clock } from 'lucide-react';
 
 const Layout = ({ children, sidebar }) => {
-    const { user, logout } = useAuth();
+    const { user, logout, loginAs } = useAuth();
+    const { getLicenseStatus, checkPlanExpiries } = useUsers();
+
+    const licenseStatus = getLicenseStatus(user);
+    const planInfo = PLANS[user?.plan] || PLANS.basic;
+
+    // Check expiries on mount or plan change
+    React.useEffect(() => {
+        const handleCheck = async () => {
+            const updatedUser = await checkPlanExpiries(user);
+            if (updatedUser) {
+                loginAs(updatedUser); // Refresh session if plan changed or notified
+            }
+        };
+        handleCheck();
+    }, [user?.id, user?.plan]);
 
     return (
         <div className="min-h-screen flex relative overflow-hidden bg-slate-50">
@@ -78,6 +94,36 @@ const Layout = ({ children, sidebar }) => {
                     </div>
 
                     <div className="flex items-center gap-4">
+                        {user?.role !== 'admin' && (
+                            <div className="flex items-center gap-3">
+                                {/* Plan Badge */}
+                                <div className={`flex flex-col items-end`}>
+                                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full border shadow-sm ${user?.plan === 'basic_promo'
+                                            ? 'bg-indigo-50 border-indigo-200 text-indigo-700'
+                                            : `bg-${planInfo.color}-50 border-${planInfo.color}-100 text-${planInfo.color}-700`
+                                        }`}>
+                                        <Zap className="w-3 h-3 animate-pulse" />
+                                        <span className="text-[10px] font-black uppercase tracking-wider">
+                                            {user?.plan === 'basic_promo' ? 'Plan Pro Prueba' : `Plan ${planInfo.label}`}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 mt-1">
+                                        {licenseStatus.daysLeft <= 3 ? (
+                                            <div className="flex items-center gap-1 text-red-500 animate-bounce">
+                                                <AlertTriangle className="w-3 h-3" />
+                                                <span className="text-[9px] font-bold">{licenseStatus.daysLeft} días restantes</span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-1 text-slate-400">
+                                                <Clock className="w-3 h-3" />
+                                                <span className="text-[9px] font-medium">{licenseStatus.daysLeft} días restantes</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {user?.role === 'admin' && (
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-50 border border-primary-100 rounded-full">
                                 <Shield className="w-3.5 h-3.5 text-primary-700" />

@@ -60,3 +60,59 @@ export const sendSecurityEmail = async (type, details = {}) => {
         return { success: false, error: errorMessage };
     }
 };
+
+/**
+ * Notifica al usuario y al administrador sobre el estado de su plan.
+ * @param {string} type - 'warning' (por vencer) o 'expired' (vencido)
+ * @param {Object} user - Datos del usuario
+ * @param {number} daysLeft - Días restantes
+ */
+export const sendPlanNotification = async (type, user, daysLeft = 0) => {
+    try {
+        const isWarning = type === 'warning';
+        const subject = isWarning
+            ? `⚠️ Tu plan vence en ${daysLeft} días - Labora`
+            : `🛑 Tu plan de Labora ha vencido`;
+
+        const message = isWarning
+            ? `Hola ${user.name}, te recordamos que tu plan ${user.plan === 'basic_promo' ? 'Pro de prueba' : user.plan} está por vencer en ${daysLeft} días. Por favor, contacta al administrador para renovar.`
+            : `Hola ${user.name}, tu plan ${user.plan === 'basic_promo' ? 'Pro de prueba' : user.plan} ha vencido hoy. Tu acceso ha sido limitado al plan Básico si correspondía.`;
+
+        // Notificación al Admin
+        await emailjs.send(
+            EMAILJS_CONFIG.SERVICE_ID,
+            EMAILJS_CONFIG.TEMPLATE_ID,
+            {
+                to_email: EMAILJS_CONFIG.ADMIN_EMAIL,
+                user_email: user.email,
+                alert_type: isWarning ? 'Aviso de Vencimiento' : 'Plan Vencido',
+                event_date: new Date().toLocaleString('es-PE'),
+                message: `Usuario: ${user.name} (${user.email})\nPlan: ${user.plan}\nDetalle: ${message}`,
+                client_info: 'Sistema de Notificaciones Automáticas'
+            },
+            { publicKey: EMAILJS_CONFIG.PUBLIC_KEY }
+        );
+
+        // Notificación al Usuario (si tiene correo válido)
+        if (user.email && !user.email.includes('admin@techinnova.com')) {
+            await emailjs.send(
+                EMAILJS_CONFIG.SERVICE_ID,
+                EMAILJS_CONFIG.TEMPLATE_ID,
+                {
+                    to_email: user.email,
+                    user_email: user.email,
+                    alert_type: isWarning ? 'Aviso de Vencimiento' : 'Plan Vencido',
+                    event_date: new Date().toLocaleString('es-PE'),
+                    message: message,
+                    client_info: 'Labora App'
+                },
+                { publicKey: EMAILJS_CONFIG.PUBLIC_KEY }
+            );
+        }
+
+        return { success: true };
+    } catch (error) {
+        console.error('Error enviando notificación de plan:', error);
+        return { success: false, error: error.message };
+    }
+};
