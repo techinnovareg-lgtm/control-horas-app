@@ -165,6 +165,12 @@ export function useUsers() {
             contractEnd: endDate,
             createdAt: startDate,
             lastLoginAt: null,
+            // Gamificación
+            streakCount: 0,
+            lastActionDate: null,
+            totalHoursRecovered: 0,
+            hadPro: plan === 'pro' || plan === 'basic_promo',
+            achievements: [],
         };
 
         await setDoc(doc(db, 'users', userId), newUser);

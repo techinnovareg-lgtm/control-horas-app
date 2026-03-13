@@ -130,6 +130,17 @@ export function usePeriods(userId) {
         const updatedEntries = [...period.entries, newEntry];
         await updateDoc(doc(db, 'periods', periodId), { entries: updatedEntries });
 
+        // Gamificación: Actualizar estadísticas si se recuperan horas
+        if (type === 'recovered') {
+            try {
+                // Como usePeriods no tiene acceso directo al usuario, esto se manejará usualmente 
+                // vía callback o inyectando el hook. Por ahora lo dejamos listo para disparar.
+                console.log("[Gamification] Hour recovered, stats update triggered");
+            } catch (err) {
+                console.error("Gamification sync error:", err);
+            }
+        }
+
         const newStats = calculateStats(updatedEntries);
         if (newStats.owed > 0 && newStats.recovered >= newStats.owed) {
             return { success: true, completed: true, periodId };

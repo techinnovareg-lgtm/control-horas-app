@@ -4,6 +4,8 @@ import CreatePeriod from './CreatePeriod';
 import HistoryTable from './HistoryTable';
 import EntryForm from './EntryForm';
 import OverviewCharts from './OverviewCharts';
+import { useUsers } from '../../hooks/useUsers';
+import { useGamification } from '../../hooks/useGamification';
 import { exportToExcel, exportToPDF } from '../../utils/exportUtils';
 import { Archive, FileSpreadsheet, FileText, ArrowLeft, Plus, ChevronDown, Trash2, Clock, CheckCircle2, History } from 'lucide-react';
 
@@ -21,6 +23,10 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
         getPeriodStats,
         deletePeriod,
     } = usePeriods(userId);
+
+    const { users, updateUser } = useUsers();
+    const currentUser = users.find(u => u.id === userId);
+    const gamification = useGamification(currentUser, updateUser);
 
     const [showSelector, setShowSelector] = React.useState(false);
 
@@ -47,8 +53,14 @@ const Dashboard = ({ userId, showCreate, onCreateDone, viewPeriodId = null, onBa
         try {
             const result = await addEntry(type, data, targetPeriod.id);
             if (result?.completed && !isArchived) {
+                gamification.triggerCelebration();
                 alert('¡Felicidades! Has recuperado todas las horas pendientes. El período se ha completado y archivado.');
                 await archivePeriod(targetPeriod.id);
+            }
+
+            // Actualizar gamificación si es recuperación
+            if (type === 'recovered') {
+                await gamification.updateStats(Number(data.hours));
             }
         } catch (error) {
             alert(error.message);

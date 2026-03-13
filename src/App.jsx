@@ -13,7 +13,10 @@ import VacationModule from './components/dashboard/VacationModule';
 import DocumentModule from './components/dashboard/DocumentModule';
 import SecurityModule from './components/dashboard/SecurityModule';
 import { SupportView } from './components/dashboard/SupportModule';
-import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy, ShieldCheck } from 'lucide-react';
+import GamificationModule from './components/dashboard/GamificationModule';
+import { useUsers } from './hooks/useUsers';
+import { useGamification } from './hooks/useGamification';
+import { LayoutDashboard, History, Shield, Calculator, Clock, CheckCircle2, Calendar, Palmtree, FileText, LifeBuoy, ShieldCheck, Trophy } from 'lucide-react';
 
 function AppContent() {
   const { user } = useAuth();
@@ -21,6 +24,10 @@ function AppContent() {
   const [subTab, setSubTab] = useState('dashboard'); // 'dashboard', 'calculator', 'history'
   const [showCreate, setShowCreate] = useState(false);
   const [selectedPeriodId, setSelectedPeriodId] = useState(null);
+
+  const { users, updateUser } = useUsers();
+  const currentUser = users.find(u => u.id === user?.id);
+  const gamification = useGamification(currentUser, updateUser);
 
   if (!user) {
     return <Auth />;
@@ -31,6 +38,7 @@ function AppContent() {
   const renderContent = () => {
     if (activeTab === 'vacations') return <VacationModule userId={user.id} />;
     if (activeTab === 'documents') return <DocumentModule userId={user.id} />;
+    if (activeTab === 'achievements') return <GamificationModule user={currentUser} gamification={gamification} />;
     if (activeTab === 'support') return <SupportView />;
     if (activeTab === 'security') return <SecurityModule />;
     if (activeTab === 'admin' && isAdmin) return <AdminPanel />;
@@ -168,6 +176,19 @@ function AppContent() {
               Boletas
             </button>
           )}
+
+          <button
+            onClick={() => { setActiveTab('achievements'); setShowCreate(false); }}
+            className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'achievements'
+              ? 'bg-primary-50 text-primary-700 shadow-sm'
+              : 'text-slate-600 hover:bg-white hover:text-slate-900'
+              }`}
+          >
+            <div className={`p-2 rounded-xl transition-all ${activeTab === 'achievements' ? 'bg-primary-700 text-white' : 'bg-slate-100 text-slate-500'}`}>
+              <Trophy className="w-4 h-4" />
+            </div>
+            Logros
+          </button>
         </div>
       </div>
 

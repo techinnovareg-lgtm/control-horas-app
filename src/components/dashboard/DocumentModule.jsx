@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { useDocuments } from '../../hooks/useDocuments';
-import { FileText, Upload, Folder, Search, Trash2, Download, Eye } from 'lucide-react';
+import { useUsers } from '../../hooks/useUsers';
+import { FileText, Upload, Folder, Search, Trash2, Download, Eye, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const DocumentModule = ({ userId }) => {
     const { documents, loading, addDocument, deleteDocument } = useDocuments(userId);
+    const { users } = useUsers();
+    
+    // Identificar configuración pro-retención
+    const currentUser = users.find(u => u.id === userId);
+    const isPro = currentUser?.plan === 'pro' || currentUser?.plan === 'basic_promo';
+    const hadPro = currentUser?.hadPro === true;
+    const showRestricted = !isPro && hadPro;
     const [isUploading, setIsUploading] = useState(false);
     const [filterYear, setFilterYear] = useState(new Date().getFullYear());
 
@@ -62,8 +70,9 @@ const DocumentModule = ({ userId }) => {
     const years = [...new Set(documents.map(d => d.year))].sort((a, b) => b - a);
 
     // Logic for sorting and filtering
-    const sortedAndFilteredDocs = documents
-        .filter(d => d.year === Number(filterYear))
+    let filteredDocs = documents.filter(d => d.year === Number(filterYear));
+    
+    const sortedAndFilteredDocs = filteredDocs
         .sort((a, b) => {
             if (sortOrder === 'name') {
                 return a.name.localeCompare(b.name);
@@ -74,6 +83,9 @@ const DocumentModule = ({ userId }) => {
                 return dateB - dateA; // Most recent first
             }
         });
+
+    // Aplicar regla de retención: Solo los últimos 3 si es ex-PRO
+    const visibleDocs = showRestricted ? sortedAndFilteredDocs.slice(0, 3) : sortedAndFilteredDocs;
 
     const getMonthName = (m) => {
         return new Intl.DateTimeFormat('es', { month: 'long' }).format(new Date(2024, m - 1));
@@ -239,14 +251,26 @@ const DocumentModule = ({ userId }) => {
                 </div>
             </div>
 
+            {showRestricted && (
+                <div className="bg-blue-50 border-2 border-blue-100 p-6 rounded-[24px] flex items-start gap-4 animate-in slide-in-from-left duration-500 shadow-sm shadow-blue-900/5">
+                    <div className="p-3 bg-blue-100 text-blue-600 rounded-2xl">
+                        <AlertCircle className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h4 className="font-black text-blue-900 text-sm uppercase tracking-tight">Modo de Retención PRO</h4>
+                        <p className="text-xs text-blue-700/80 mt-1 font-medium leading-relaxed">Como ex-usuario PRO, conservas acceso a tus últimos 3 documentos. Actualiza tu plan para ver el historial completo y seguir cargando sin límites.</p>
+                    </div>
+                </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {sortedAndFilteredDocs.length === 0 ? (
+                {visibleDocs.length === 0 ? (
                     <div className="col-span-full py-20 text-center">
                         <Folder className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                         <p className="text-slate-400 font-medium">No hay boletas registradas para el año {filterYear}</p>
                     </div>
                 ) : (
-                    sortedAndFilteredDocs.map(doc => (
+                    visibleDocs.map(doc => (
                         <div key={doc.id} className="glass-card p-5 rounded-3xl group hover:border-primary-200 transition-all">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
